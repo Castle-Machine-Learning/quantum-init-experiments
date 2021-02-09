@@ -1,6 +1,8 @@
 .vscode/
 token_file.txt
 stats.pickle
+storage.pkl
+figures/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

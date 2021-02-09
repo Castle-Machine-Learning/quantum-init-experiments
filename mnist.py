@@ -1,64 +1,24 @@
 # based on https://github.com/pytorch/examples/blob/master/mnist/main.py
-import math
-import numpy as np
+
 import argparse
 import torch
+import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
-from qrandom import get_quantum_uniform, get_backend
-from qiskit import Aer
 import matplotlib.pyplot as plt
 import pickle
-
-
-def _calculate_fan_in_and_fan_out(tensor):
-    # from torch.nn
-    dimensions = tensor.dim()
-    if dimensions < 2:
-        raise ValueError("Fan in and fan out can not be computed for \
-            tensor with fewer than 2 dimensions")
-
-    num_input_fmaps = tensor.size(1)
-    num_output_fmaps = tensor.size(0)
-    receptive_field_size = 1
-    if tensor.dim() > 2:
-        receptive_field_size = tensor[0][0].numel()
-    fan_in = num_input_fmaps * receptive_field_size
-    fan_out = num_output_fmaps * receptive_field_size
-
-    return fan_in, fan_out
-
-
-def kaiming_normal_(tensor, a=0, fan=None, nonlinearity='relu',
-                    quantum=False, backend=Aer.get_backend('qasm_simulator'),
-                    qbits=5):
-    if not fan:
-        fan, _ = _calculate_fan_in_and_fan_out(tensor)
-
-    gain = torch.nn.init.calculate_gain(nonlinearity, a)
-    std = gain / math.sqrt(fan)
-    bound = math.sqrt(3.0) * std
-    if not quantum:
-        with torch.no_grad():
-            tensor.uniform_(-bound, bound)
-    else:
-        quantum_random = get_quantum_uniform(tensor.shape,
-                                             -bound, bound,
-                                             backend=backend,
-                                             n_qbits=qbits)
-        with torch.no_grad():
-            tensor.data.copy_(
-                torch.from_numpy(quantum_random.astype(np.float16)))
+from src.network_init import kaiming_normal_, _calculate_fan_in_and_fan_out
 
 
 class Net(nn.Module):
     """ Fully connected parameters have been reduced
         to reduce the number of random numbers required.
     """
-    def __init__(self, quantum_init=True, qbits=5):
+    def __init__(self, quantum_init=True, qbits=5,
+                 address="tcp://localhost:5555"):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, stride=2)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
@@ -69,10 +29,10 @@ class Net(nn.Module):
         self.quantum_init = quantum_init
         if self.quantum_init:
             self.qbits = qbits
-            self.qbackend = get_backend(self.qbits)
+            self.qaddress = address
             # self.qbackend = Aer.get_backend('qasm_simulator')
         else:
-            self.qbackend = None
+            self.qaddress = None
             self.qbits = None
 
         # initialize weights
@@ -87,7 +47,7 @@ class Net(nn.Module):
 
             kaiming_normal_(param, fan=fan,
                             quantum=self.quantum_init,
-                            backend=self.qbackend,
+                            address=self.qaddress,
                             qbits=self.qbits)
             previous_tensor = param
 
@@ -192,7 +152,7 @@ def main():
         train_kwargs.update(cuda_kwargs)
         test_kwargs.update(cuda_kwargs)
 
-    transform=transforms.Compose([
+    transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
         ])
@@ -200,7 +160,7 @@ def main():
                               transform=transform)
     dataset2 = datasets.MNIST('../data', train=False,
                               transform=transform)
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
+    train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
     if args.pseudo_init:
