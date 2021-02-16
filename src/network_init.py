@@ -5,8 +5,7 @@ from src import FCMLQ
 
 
 def get_quantum_uniform(shape: tuple, low: float, high: float,
-                        address='tcp://localhost:5555',
-                        n_qbits=5) -> np.array:
+                        address='tcp://localhost:5555') -> np.array:
     """ Get a numpy array with quantum uniformly initialized numbers
 
     Args:
@@ -15,7 +14,6 @@ def get_quantum_uniform(shape: tuple, low: float, high: float,
         high (float): The upper bound of the uniform distribution
         address (optional): Location of the quantum randomness
             provider. Defaults to tcp://localhost:5555 .
-        n_qbits (int): The number of qbits to utilize.
 
     Returns:
         uniform (nparray): Array initialized to U(a, b).
@@ -52,7 +50,7 @@ def kaiming_normal_(tensor: torch.tensor,
                     a=0, fan=None,
                     nonlinearity: str = 'relu',
                     quantum=True, address='tcp://localhost:5555',
-                    qbits=5) -> None:
+                    ) -> None:
     """ In place-initializtion with a quantum kaiming_normal initialization.
         The implementation follows:
         https://pytorch.org/docs/stable/_modules/torch/nn/init.html#kaiming_normal_
@@ -68,8 +66,7 @@ def kaiming_normal_(tensor: torch.tensor,
             Defaults to True.
         address (str, optional): [description].
             Defaults to 'tcp://localhost:5555'.
-        qbits (int, optional): [description]. Defaults to 5.
-    """    
+    """
     if not fan:
         fan, _ = _calculate_fan_in_and_fan_out(tensor)
 
@@ -82,8 +79,7 @@ def kaiming_normal_(tensor: torch.tensor,
     else:
         quantum_random = get_quantum_uniform(tensor.shape,
                                              -bound, bound,
-                                             address=address,
-                                             n_qbits=qbits)
+                                             address=address)
         with torch.no_grad():
             tensor.data.copy_(
                 torch.from_numpy(quantum_random.astype(np.float16)))

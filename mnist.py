@@ -17,7 +17,7 @@ class Net(nn.Module):
     """ Fully connected parameters have been reduced
         to reduce the number of random numbers required.
     """
-    def __init__(self, quantum_init=True, qbits=5,
+    def __init__(self, quantum_init=True,
                  address="tcp://localhost:5555"):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, stride=2)
@@ -28,12 +28,10 @@ class Net(nn.Module):
         self.fc2 = nn.Linear(64, 10)
         self.quantum_init = quantum_init
         if self.quantum_init:
-            self.qbits = qbits
             self.qaddress = address
             # self.qbackend = Aer.get_backend('qasm_simulator')
         else:
             self.qaddress = None
-            self.qbits = None
 
         # initialize weights
         # loop over the parameters
@@ -47,8 +45,7 @@ class Net(nn.Module):
 
             kaiming_normal_(param, fan=fan,
                             quantum=self.quantum_init,
-                            address=self.qaddress,
-                            qbits=self.qbits)
+                            address=self.qaddress)
             previous_tensor = param
 
     def forward(self, x):
@@ -105,6 +102,15 @@ def test(model, device, test_loader):
     return test_loss, test_acc
 
 
+def compute_parameter_total(net):
+    total = 0
+    for p in net.parameters():
+        if p.requires_grad:
+            print(p.shape)
+            total += np.prod(p.shape)
+    return total
+
+
 def main():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -118,7 +124,7 @@ def main():
                         help='learning rate (default: 1.0)')
     parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
-    parser.add_argument('--no-cuda', action='store_true', default=False,
+    parser.add_argument('--no-cuda', action='store_true', default=False, 
                         help='disables CUDA training')
     parser.add_argument('--dry-run', action='store_true', default=False,
                         help='quickly check a single pass')
@@ -132,8 +138,6 @@ def main():
                         help='If True initialize using real qseudo randomnes')
     parser.add_argument('--pickle-stats', action='store_true', default=False,
                         help='If True stores test loss and acc in pickle file.')
-    parser.add_argument('--qbits', type=int, default=5, metavar='N',
-                        help='The number of qbits to use. Defaults to 5.')
 
     args = parser.parse_args()
     print('args', args)
@@ -168,8 +172,10 @@ def main():
         model = Net(quantum_init=False).to(device)
     else:
         print('initializing using quantum randomness.')
-        model = Net(quantum_init=True, qbits=args.qbits).to(device)
+        model = Net(quantum_init=True).to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+
+    print('weight count:', compute_parameter_total(model))
 
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
     test_loss_lst = []
