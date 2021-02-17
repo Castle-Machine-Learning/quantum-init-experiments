@@ -10,7 +10,7 @@ from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
 import matplotlib.pyplot as plt
 import pickle
-from src.network_init import kaiming_normal_, _calculate_fan_in_and_fan_out
+from src.network_init import kaiming_uniform_, _calculate_fan_in_and_fan_out
 
 
 class Net(nn.Module):
@@ -43,7 +43,7 @@ class Net(nn.Module):
             else:
                 fan = None
 
-            kaiming_normal_(param, fan=fan,
+            kaiming_uniform_(param, fan=fan,
                             quantum=self.quantum_init,
                             address=self.qaddress)
             previous_tensor = param

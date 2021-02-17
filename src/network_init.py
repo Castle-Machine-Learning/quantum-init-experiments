@@ -46,14 +46,14 @@ def _calculate_fan_in_and_fan_out(tensor):
     return fan_in, fan_out
 
 
-def kaiming_normal_(tensor: torch.tensor,
-                    a=0, fan=None,
-                    nonlinearity: str = 'relu',
-                    quantum=True, address='tcp://localhost:5555',
-                    ) -> None:
-    """ In place-initializtion with a quantum kaiming_normal initialization.
+def kaiming_uniform_(tensor: torch.tensor,
+                     a=0, fan=None,
+                     nonlinearity: str = 'relu',
+                     quantum=True, address='tcp://localhost:5555',
+                     ) -> None:
+    """ In place-initializtion with a quantum kaiming_uniform initialization.
         The implementation follows:
-        https://pytorch.org/docs/stable/_modules/torch/nn/init.html#kaiming_normal_
+        https://pytorch.org/docs/stable/_modules/torch/nn/init.html#kaiming_uniform_
 
     Args:
         tensor (torch.tensor): The tensor we want to initialize with
@@ -64,7 +64,7 @@ def kaiming_normal_(tensor: torch.tensor,
         nonlinearity (str, optional): [description]. Defaults to 'relu'.
         quantum (bool, optional): Use pseudorandom numbers if False.
             Defaults to True.
-        address (str, optional): [description].
+        address (str, optional): Location of the quantum randomness server.
             Defaults to 'tcp://localhost:5555'.
     """
     if not fan:
