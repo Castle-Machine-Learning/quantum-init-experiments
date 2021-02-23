@@ -1,7 +1,8 @@
 import torch
 import numpy as np
-from torch.nn.parameter import Parameter
 import torch.nn.init as init
+from torch.nn.parameter import Parameter
+from src.network_init import get_quantum_uniform
 
 
 def generate_data_adding(time_steps, n_data):
@@ -102,16 +103,23 @@ class LSTMCell(torch.nn.Module):
 
         self.proj = Parameter(torch.Tensor(hidden_size, output_size))
 
-    def reset_parameters(self, quantum=False) -> None:
+    def reset_parameters(self, quantum=False,
+                         address='tcp://localhost:5555') -> None:
         stdv = 1.0 / np.sqrt(self.hidden_size)
         for weight in self.parameters():
             if quantum:
-                # TODO: Update!
+                uniform = get_quantum_uniform(weight.shape,
+                    -stdv, stdv, address=address)
                 init.uniform_(weight, -stdv, stdv)
-            else:
-                init.uniform_(weight, -stdv, stdv)
+                with torch.no_grad():
+                    weight.data.copy_(
+                        torch.from_numpy(uniform.astype(np.float16)))
 
-    def forward(self, x, c, ym1):
+            else:
+                with torch.no_grad():
+                    init.uniform_(weight, -stdv, stdv)
+
+    def forward(self, x, c, ym1) -> tuple:
         z = torch.matmul(x, self.Wz) + torch.matmul(ym1, self.Rz) + self.bz
         z = self.g(z)
 
@@ -134,7 +142,7 @@ class LSTMCell(torch.nn.Module):
 
         return (c, y)
 
-    def zero_state(self, batch_size):
+    def zero_state(self, batch_size: int) -> tuple:
         return (torch.zeros(batch_size, self.hidden_size),
                 torch.zeros(batch_size, self.output_size))
 

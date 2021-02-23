@@ -72,7 +72,7 @@ if __name__ == '__main__':
         - Adding and Memory Problems')
     parser.add_argument('--problem', type=str, default='adding',
                         help='choose adding or memory')
-    parser.add_argument('--hidden', type=int, default=128,
+    parser.add_argument('--hidden', type=int, default=256,
                         help='Cell size: Default 512.')
     parser.add_argument('--time_steps', type=int, default=20,
                         help='The number of time steps \

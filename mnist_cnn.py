@@ -209,8 +209,8 @@ def main():
             res = pickle.load(open("stats.pickle", "rb"))
         except (OSError, IOError) as e:
             res = []
-            print(e,
-                  'stats.pickle does not exist, creating a new file.')
+            print(e, 'stats.pickle does not exist, \
+                  creating a new file.')
 
         res.append({'args': args,
                     'test_loss_lst': test_loss_lst,
