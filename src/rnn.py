@@ -122,24 +122,18 @@ class LSTMCell(torch.nn.Module):
     def forward(self, x, c, ym1) -> tuple:
         z = torch.matmul(x, self.Wz) + torch.matmul(ym1, self.Rz) + self.bz
         z = self.g(z)
-
         i = torch.matmul(x, self.Wi) + torch.matmul(ym1, self.Ri) \
             + self.pi*c + self.bi
         i = self.gate_act(i)
-
         f = torch.matmul(x, self.Wf) + torch.matmul(ym1, self.Rf) \
             + self.pf*c + self.bf
         f = self.gate_act(f)
-
         c = z*i + c*f
-
         o = torch.matmul(x, self.Wo) + torch.matmul(ym1, self.Ro) \
             + self.po*c + self.bo
         o = self.gate_act(o)
-
         y = self.h(c)*o
         y = torch.matmul(y, self.proj)
-
         return (c, y)
 
     def zero_state(self, batch_size: int) -> tuple:

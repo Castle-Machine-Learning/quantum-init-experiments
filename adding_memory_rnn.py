@@ -70,7 +70,7 @@ def train_test_loop(args, in_x, in_y_gt, iteration_no, cell, loss_fun,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sequence Modeling \
         - Adding and Memory Problems')
-    parser.add_argument('--problem', type=str, default='adding',
+    parser.add_argument('--problem', type=str, default='memory',
                         help='choose adding or memory')
     parser.add_argument('--hidden', type=int, default=256,
                         help='Cell size: Default 512.')
@@ -149,7 +149,7 @@ if __name__ == '__main__':
         if args.problem == 'memory':
             # --- one hot encoding -------------
             x_train_batch = torch.nn.functional.one_hot(
-                x_train_batch.type(torch.int64))
+                x_train_batch.type(torch.int64)).type(torch.float32)
             y_train_batch = y_train_batch.type(torch.int64)
         train_loss, _ = train_test_loop(
             args, x_train_batch, y_train_batch, train_iteration_no, cell,
@@ -190,3 +190,17 @@ if __name__ == '__main__':
     time_str = str(datetime.datetime.today())
     print('time:', time_str, 'experiment took',
           time.time() - time_start, '[s]')
+
+    if args.pickle_stats:
+        try:
+            res = pickle.load(open("stats_rnn.pickle", "rb"))
+        except (OSError, IOError) as e:
+            res = []
+            print(e, 'stats.pickle does not exist, \
+                  creating a new file.')
+
+        res.append({'args': args,
+                    'train_loss_lst': train_loss_lst,
+                    'test_loss_mean': np.mean(test_loss_lst)})
+        pickle.dump(res, open("stats_rnn.pickle", "wb"))
+        print('stats_rnn.pickle saved.')
