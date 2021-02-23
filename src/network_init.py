@@ -22,9 +22,7 @@ def get_quantum_uniform(shape: tuple, low: float, high: float,
     zero_one = FCMLQ.request_rnd(number_count, address=address)
     zero_one = np.reshape(zero_one, shape)
     # zero_one = get_array(shape, backend=backend, n_qbits=n_qbits)
-    spread = np.abs(low) + np.abs(high)
-    pos_array = zero_one * spread
-    uniform = pos_array + low
+    uniform = (high - low) * zero_one + low
     return uniform
 
 
