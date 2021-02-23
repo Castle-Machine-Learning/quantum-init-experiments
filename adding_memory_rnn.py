@@ -167,7 +167,7 @@ if __name__ == '__main__':
             if args.problem == 'memory':
                 # --- one hot encoding -------------
                 x_test_batch = torch.nn.functional.one_hot(
-                    x_test_batch.type(torch.int64))
+                    x_test_batch.type(torch.int64)).type(torch.float32)
                 y_test_batch = y_test_batch.type(torch.int64)
             test_loss, test_true_sum = train_test_loop(
                 args, x_test_batch, y_test_batch, test_iteration_no, cell,
