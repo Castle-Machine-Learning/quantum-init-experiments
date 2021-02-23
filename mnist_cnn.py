@@ -44,8 +44,8 @@ class Net(nn.Module):
                 fan = None
 
             kaiming_uniform_(param, fan=fan,
-                            quantum=self.quantum_init,
-                            address=self.qaddress)
+                             quantum=self.quantum_init,
+                             address=self.qaddress)
             previous_tensor = param
 
     def forward(self, x):
@@ -95,7 +95,8 @@ def test(model, device, test_loader):
 
     test_loss /= len(test_loader.dataset)
 
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+    print('\nTest set: Average loss: {:.4f},  \
+          Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
     test_acc = 100. * correct / len(test_loader.dataset)
@@ -116,7 +117,8 @@ def main():
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
     parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                         help='input batch size for training (default: 64)')
-    parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
+    parser.add_argument('--test-batch-size', type=int, default=1000,
+                        metavar='N',
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=14, metavar='N',
                         help='number of epochs to train (default: 14)')
@@ -124,20 +126,22 @@ def main():
                         help='learning rate (default: 1.0)')
     parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
-    parser.add_argument('--no-cuda', action='store_true', default=False, 
+    parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
     parser.add_argument('--dry-run', action='store_true', default=False,
                         help='quickly check a single pass')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='pseudo-random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
-                        help='how many batches to wait before logging training status')
+                        help='how many batches to wait before \
+                              logging training status')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
     parser.add_argument('--pseudo-init', action='store_true', default=False,
                         help='If True initialize using real qseudo randomnes')
     parser.add_argument('--pickle-stats', action='store_true', default=False,
-                        help='If True stores test loss and acc in pickle file.')
+                        help='If True stores test loss \
+                              and acc in pickle file.')
 
     args = parser.parse_args()
     print('args', args)
