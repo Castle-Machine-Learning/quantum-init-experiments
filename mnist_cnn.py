@@ -1,5 +1,5 @@
 # based on https://github.com/pytorch/examples/blob/master/mnist/main.py
-
+import matplotlib.pyplot as plt
 import argparse
 import torch
 import numpy as np
@@ -8,7 +8,6 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
-import matplotlib.pyplot as plt
 import pickle
 from src.network_init import kaiming_uniform_, _calculate_fan_in_and_fan_out
 
