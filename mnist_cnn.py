@@ -1,5 +1,5 @@
 # based on https://github.com/pytorch/examples/blob/master/mnist/main.py
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import argparse
 import torch
 import numpy as np
@@ -193,15 +193,16 @@ def main():
     if args.save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")
 
-    plt.plot(test_loss_lst)
-    plt.xlabel('epochs')
-    plt.ylabel('test loss')
-    if args.pseudo_init:
-        plt.title('pseudo-random-init')
-        plt.savefig('pseudornd.png')
-    else:
-        plt.title('quantum-random-init')
-        plt.savefig('qrnd.png')
+    # save plots.
+    # plt.plot(test_loss_lst)
+    # plt.xlabel('epochs')
+    # plt.ylabel('test loss')
+    # if args.pseudo_init:
+    #     plt.title('pseudo-random-init')
+    #     plt.savefig('pseudornd.png')
+    # else:
+    #     plt.title('quantum-random-init')
+    #     plt.savefig('qrnd.png')
 
     if args.pickle_stats:
         try:

@@ -1,8 +1,9 @@
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
+import tikzplotlib
 
-res = pickle.load(open("stats.pickle", "rb"))
+res = pickle.load(open("stats_cnn.pickle", "rb"))
 
 pseudo_acc = []
 pseudo_loss = []
@@ -28,11 +29,14 @@ x = np.array(range(len(pseudo_acc_mean)))
 qntrnd_acc_mean = np.mean(qntrnd_acc, axis=0)
 qntrnd_acc_std = np.std(qntrnd_acc, axis=0)
 
-plt.errorbar(x, pseudo_acc_mean, yerr=pseudo_acc_std, label='pseudo')
-plt.errorbar(x, qntrnd_acc_mean, yerr=qntrnd_acc_std, label='quantum')
+plt.errorbar(x, pseudo_acc_mean, yerr=pseudo_acc_std, label='pseudo',
+             capsize=2)
+plt.errorbar(x, qntrnd_acc_mean, yerr=qntrnd_acc_std, label='quantum',
+             capsize=2)
 plt.ylabel('acc')
 plt.xlabel('epochs')
 plt.legend()
-plt.savefig('random_eval.png')
+# plt.savefig('random_eval.png')
+tikzplotlib.save('random_eval.tex', standalone=True)
 plt.show()
 print('plots saved.')
