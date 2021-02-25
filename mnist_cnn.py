@@ -43,7 +43,7 @@ class Net(nn.Module):
                 fan = None
 
             kaiming_uniform_(param, fan=fan,
-                             quantum=self.quantum_init,
+                             mode='quantum' if self.quantum_init else 'pseudo',
                              address=self.qaddress)
             previous_tensor = param
 
