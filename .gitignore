@@ -3,6 +3,7 @@ token_file.txt
 stats.pickle
 storage.pkl
 figures/
+storage.7z
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
