@@ -16,7 +16,7 @@ class Net(nn.Module):
     """ Fully connected parameters have been reduced
         to reduce the number of random numbers required.
     """
-    def __init__(self, quantum_init=True,
+    def __init__(self, init='quantum',
                  address="tcp://localhost:5555"):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, stride=2)
@@ -25,8 +25,8 @@ class Net(nn.Module):
         self.dropout2 = nn.Dropout(0.5)
         self.fc1 = nn.Linear(1600, 64)
         self.fc2 = nn.Linear(64, 10)
-        self.quantum_init = quantum_init
-        if self.quantum_init:
+        self.init = init
+        if self.init == 'quantum':
             self.qaddress = address
             # self.qbackend = Aer.get_backend('qasm_simulator')
         else:
@@ -43,7 +43,7 @@ class Net(nn.Module):
                 fan = None
 
             kaiming_uniform_(param, fan=fan,
-                             quantum=self.quantum_init,
+                             mode=self.init,
                              address=self.qaddress)
             previous_tensor = param
 
@@ -136,8 +136,8 @@ def main():
                               logging training status')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
-    parser.add_argument('--pseudo-init', action='store_true', default=False,
-                        help='If True initialize using real qseudo randomnes')
+    parser.add_argument('--init', choices=['quantum','pseudo','pseudoquantum'], default='quantum',
+                        help='Set initialization method')
     parser.add_argument('--pickle-stats', action='store_true', default=False,
                         help='If True stores test loss \
                               and acc in pickle file.')
@@ -171,12 +171,8 @@ def main():
     train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
-    if args.pseudo_init:
-        print('initializing using pseudorandom numbers.')
-        model = Net(quantum_init=False).to(device)
-    else:
-        print('initializing using quantum randomness.')
-        model = Net(quantum_init=True).to(device)
+    print(f'initializing using {args.init} numbers.')
+    model = Net(init=args.init).to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
     print('weight count:', compute_parameter_total(model))

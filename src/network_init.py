@@ -42,10 +42,23 @@ def _calculate_fan_in_and_fan_out(tensor):
     return fan_in, fan_out
 
 
+def pseudo_quantum_uniform(from_, to_, size=1, mean_qubit_value=0.475, bits_per_float=16):
+    # make sure size is a tuple
+    if isinstance(size, int):
+        size = (size,)
+
+    # this creates a potentially very large intermediate array to store all bits..
+    # a different solution might be to build up the values incrementally, sacrificing
+    # some performance.
+    bits = np.random.binomial(1, p=mean_qubit_value, size=(*size, bits_per_float))
+    e = 2.0 ** np.arange(-bits_per_float, 0)
+    return (to_-from_)*np.dot(bits, e)+from_
+
+
 def kaiming_uniform_(tensor: torch.tensor,
                      a=0, fan=None,
                      nonlinearity: str = 'relu',
-                     quantum=True, address='tcp://localhost:5555',
+                     mode='quantum', address='tcp://localhost:5555',
                      ) -> None:
     """ In place-initializtion with a quantum kaiming_uniform initialization.
         The implementation follows:
@@ -69,13 +82,19 @@ def kaiming_uniform_(tensor: torch.tensor,
     gain = torch.nn.init.calculate_gain(nonlinearity, a)
     std = gain / math.sqrt(fan)
     bound = math.sqrt(3.0) * std
-    if not quantum:
+
+    if mode == 'quantum':
+        quantum_random = get_quantum_uniform(tensor.shape, -bound, bound, address=address)
+        with torch.no_grad():
+            tensor.data.copy_(torch.from_numpy(quantum_random.astype(np.float16)))
+
+    elif mode == 'pseudo':
         with torch.no_grad():
             tensor.uniform_(-bound, bound)
-    else:
-        quantum_random = get_quantum_uniform(tensor.shape,
-                                             -bound, bound,
-                                             address=address)
+    
+    elif mode == 'pseudoquantum':
         with torch.no_grad():
-            tensor.data.copy_(
-                torch.from_numpy(quantum_random.astype(np.float16)))
+            tensor.data.copy_(pseudo_quantum_uniform(-bound, bound, size=tuple(tonsor.shape)).astype(np.float16))
+   
+    else:
+        raise ValueError(f'Unknown model "{mode}", options are: "quantum", "pseudo", "pseudoquantum"') 
