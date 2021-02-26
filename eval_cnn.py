@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tikzplotlib
 
-res = pickle.load(open("stats_cnn.pickle", "rb"))
+res = pickle.load(open("stats.pickle", "rb"))
 
 pseudo_acc = []
 pseudo_loss = []
