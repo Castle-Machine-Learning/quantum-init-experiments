@@ -42,7 +42,9 @@ def _calculate_fan_in_and_fan_out(tensor):
     return fan_in, fan_out
 
 
-def pseudo_quantum_uniform(from_, to_, size=1, mean_qubit_value=0.475, bits_per_float=16):
+def pseudo_quantum_uniform(from_: float, to_:float, size: tuple=1,
+                           mean_qubit_value: float=0.475,
+                           bits_per_float: int=16):
     # make sure size is a tuple
     if isinstance(size, int):
         size = (size,)
@@ -94,7 +96,8 @@ def kaiming_uniform_(tensor: torch.tensor,
     
     elif mode == 'pseudoquantum':
         with torch.no_grad():
-            tensor.data.copy_(pseudo_quantum_uniform(-bound, bound, size=tuple(tonsor.shape)).astype(np.float16))
+            tensor.data.copy_(torch.from_numpy(
+                pseudo_quantum_uniform(-bound, bound, size=tuple(tensor.shape)).astype(np.float16)))
    
     else:
         raise ValueError(f'Unknown model "{mode}", options are: "quantum", "pseudo", "pseudoquantum"') 
