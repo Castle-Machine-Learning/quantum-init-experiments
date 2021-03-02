@@ -43,20 +43,37 @@ quantum_acc_std = np.std(quantum_acc, axis=0)
 pseudoquantum_acc_mean = np.mean(pseudoquantum_acc, axis=0)
 pseudoquantum_acc_std = np.std(pseudoquantum_acc, axis=0)
 
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
 x = np.array(range(len(pseudo_acc_mean)))
-plt.errorbar(x, pseudo_acc_mean, yerr=pseudo_acc_std, label='pseudo',
-             capsize=2)
+# plt.errorbar(x, pseudo_acc_mean, yerr=pseudo_acc_std, label='pseudo',
+#              capsize=2)
+plt.plot(x, pseudo_acc_mean, label='pseudo', color=colors[0], marker="o")
+plt.fill_between(x, pseudo_acc_mean - pseudo_acc_std,
+                 pseudo_acc_mean + pseudo_acc_std,
+                 color=colors[0], alpha=0.2)
+
 x = np.array(range(len(quantum_acc_mean)))
-plt.errorbar(x, quantum_acc_mean, yerr=quantum_acc_std, label='quantum',
-             capsize=2)
+plt.plot(x, quantum_acc_mean, label='quantum', color=colors[1], marker="s")
+plt.fill_between(x, quantum_acc_mean - quantum_acc_std,
+                 quantum_acc_mean + quantum_acc_std,
+                 color=colors[1], alpha=0.2)
+
 x = np.array(range(len(pseudoquantum_acc_mean)))
-plt.errorbar(x, pseudoquantum_acc_mean, yerr=pseudoquantum_acc_std,
-             label='pseudoquantum', capsize=2)
+# plt.errorbar(x, pseudoquantum_acc_mean, yerr=pseudoquantum_acc_std,
+#              label='pseudoquantum', capsize=2)
+plt.plot(x, pseudoquantum_acc_mean, label='pseudoquantum', color=colors[2],
+         marker="v")
+plt.fill_between(x, pseudoquantum_acc_mean - pseudoquantum_acc_std,
+                 pseudoquantum_acc_mean + pseudoquantum_acc_std,
+                 color=colors[2], alpha=0.2)
 
 plt.ylabel('acc')
 plt.xlabel('epochs')
+plt.title('CNN on MNIST')
 plt.legend()
 # plt.savefig('random_eval.png')
-# tikzplotlib.save('random_eval.tex', standalone=True)
+tikzplotlib.save('random_eval.tex', standalone=True)
 plt.show()
+
 print('plots saved.')
