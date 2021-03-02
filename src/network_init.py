@@ -42,17 +42,17 @@ def _calculate_fan_in_and_fan_out(tensor):
     return fan_in, fan_out
 
 
-def pseudo_quantum_uniform(from_: float, to_:float, size: tuple=1,
-                           mean_qubit_value: float=0.475,
-                           bits_per_float: int=16):
+def pseudo_quantum_uniform(from_: float, to_: float, size: tuple = 1,
+                           mean_qubit_value: float = 0.475,
+                           bits_per_float: int = 16):
     # make sure size is a tuple
     if isinstance(size, int):
         size = (size,)
-
     # this creates a potentially very large intermediate array to store all bits..
     # a different solution might be to build up the values incrementally, sacrificing
     # some performance.
-    bits = np.random.binomial(1, p=mean_qubit_value, size=(*size, bits_per_float))
+    bits = np.random.binomial(1, p=mean_qubit_value,
+                              size=(*size, bits_per_float))
     e = 2.0 ** np.arange(-bits_per_float, 0)
     return (to_-from_)*np.dot(bits, e)+from_
 
@@ -86,18 +86,19 @@ def kaiming_uniform_(tensor: torch.tensor,
     bound = math.sqrt(3.0) * std
 
     if mode == 'quantum':
-        quantum_random = get_quantum_uniform(tensor.shape, -bound, bound, address=address)
+        quantum_random = get_quantum_uniform(tensor.shape, -bound, bound,
+                                             address=address)
         with torch.no_grad():
-            tensor.data.copy_(torch.from_numpy(quantum_random.astype(np.float16)))
-
+            tensor.data.copy_(torch.from_numpy(
+                quantum_random.astype(np.float16)))
     elif mode == 'pseudo':
         with torch.no_grad():
             tensor.uniform_(-bound, bound)
-    
     elif mode == 'pseudoquantum':
         with torch.no_grad():
             tensor.data.copy_(torch.from_numpy(
                 pseudo_quantum_uniform(-bound, bound, size=tuple(tensor.shape)).astype(np.float16)))
-   
     else:
-        raise ValueError(f'Unknown model "{mode}", options are: "quantum", "pseudo", "pseudoquantum"') 
+        raise ValueError(f'Unknown model "{mode}", options are: "quantum",\
+                         "pseudo", "pseudoquantum"')
+

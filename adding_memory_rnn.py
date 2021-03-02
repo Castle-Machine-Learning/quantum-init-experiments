@@ -11,7 +11,6 @@ import numpy as np
 from src.rnn import LSTMCell, generate_data_adding, generate_data_memory
 from src.util import pd_to_string, compute_parameter_total
 import pickle
-import collections
 
 
 def train_test_loop(args, in_x, in_y_gt, iteration_no, cell, loss_fun,
@@ -85,12 +84,19 @@ if __name__ == '__main__':
                         help='The size of the training batches. Default 6e5')
     parser.add_argument('--n_test', type=int, default=int(1e4),
                         help='The size of the training batches. Default 1e4')
-    parser.add_argument('--pseudo-init', action='store_true', default=False,
-                        help='If True initialize using real qseudo randomnes')
+    parser.add_argument('--init', choices=['quantum', 'pseudo',
+                        'pseudoquantum'], default='quantum',
+                        help='Set initialization method')
     parser.add_argument('--pickle-stats', action='store_true', default=False,
                         help='If True stores test loss \
                               and acc in pickle file.')
+    parser.add_argument('--seed', type=int, default=1, metavar='S',
+                        help='pseudo-random seed (default: 1)')
     args = parser.parse_args()
+
+    torch.manual_seed(args.seed)
+    # Cross entropy not supportet.
+    # torch.set_deterministic(True)
 
     train_iterations = int(args.n_train/args.batch_size)
     test_iterations = int(args.n_test/args.batch_size)
@@ -128,10 +134,7 @@ if __name__ == '__main__':
                     hidden_size=args.hidden,
                     output_size=output_size)
     cell.cuda()
-    if args.pseudo_init:
-        cell.reset_parameters(quantum=False)
-    else:
-        cell.reset_parameters(quantum=True)
+    cell.reset_parameters(init=args.init)
 
     pt = compute_parameter_total(cell)
     print('parameter total', pt)

@@ -1,8 +1,8 @@
 import torch
 import numpy as np
-import torch.nn.init as init
 from torch.nn.parameter import Parameter
 from src.network_init import get_quantum_uniform
+from src.network_init import pseudo_quantum_uniform
 
 
 def generate_data_adding(time_steps, n_data):
@@ -103,21 +103,28 @@ class LSTMCell(torch.nn.Module):
 
         self.proj = Parameter(torch.Tensor(hidden_size, output_size))
 
-    def reset_parameters(self, quantum=False,
+    def reset_parameters(self, init: str,
                          address='tcp://localhost:5555') -> None:
         stdv = 1.0 / np.sqrt(self.hidden_size)
         for weight in self.parameters():
-            if quantum:
-                uniform = get_quantum_uniform(weight.shape,
-                    -stdv, stdv, address=address)
-                init.uniform_(weight, -stdv, stdv)
+            if init == 'quantum':
+                quantum_random = get_quantum_uniform(weight.shape, -stdv, stdv,
+                                                     address=address)
                 with torch.no_grad():
-                    weight.data.copy_(
-                        torch.from_numpy(uniform.astype(np.float16)))
-
+                    weight.data.copy_(torch.from_numpy(
+                        quantum_random.astype(np.float16)))
+            elif init == 'pseudo':
+                with torch.no_grad():
+                    weight.uniform_(-stdv, stdv)
+            elif init == 'pseudoquantum':
+                with torch.no_grad():
+                    weight.data.copy_(torch.from_numpy(
+                        pseudo_quantum_uniform(-stdv, stdv,
+                                               size=tuple(weight.shape)
+                                               ).astype(np.float16)))
             else:
-                with torch.no_grad():
-                    init.uniform_(weight, -stdv, stdv)
+                raise ValueError(f'Unknown model "{init}", options are: "quantum",\
+                                "pseudo", "pseudoquantum"')
 
     def forward(self, x, c, ym1) -> tuple:
         z = torch.matmul(x, self.Wz) + torch.matmul(ym1, self.Rz) + self.bz

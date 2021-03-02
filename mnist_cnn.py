@@ -136,7 +136,8 @@ def main():
                               logging training status')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
-    parser.add_argument('--init', choices=['quantum','pseudo','pseudoquantum'], default='quantum',
+    parser.add_argument('--init', choices=['quantum', 'pseudo',
+                        'pseudoquantum'], default='quantum',
                         help='Set initialization method')
     parser.add_argument('--pickle-stats', action='store_true', default=False,
                         help='If True stores test loss \
