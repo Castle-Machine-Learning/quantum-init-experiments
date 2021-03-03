@@ -73,11 +73,11 @@ if __name__ == '__main__':
                         help='choose adding or memory')
     parser.add_argument('--hidden', type=int, default=256,
                         help='Cell size: Default 512.')
-    parser.add_argument('--time_steps', type=int, default=20,
+    parser.add_argument('--time_steps', type=int, default=64,
                         help='The number of time steps \
-                              in the problem, default 150.')
-    parser.add_argument('--batch_size', type=int, default=50,
-                        help='The size of the training batches. default 50')
+                              in the problem, default 64.')
+    parser.add_argument('--batch_size', type=int, default=128,
+                        help='The size of the training batches. default 128')
     parser.add_argument('--lr', type=float, default=1e-3,
                         help='The size of the training batches.')
     parser.add_argument('--n_train', type=int, default=int(6e5),

@@ -202,9 +202,10 @@ def main():
     #     plt.title('quantum-random-init')
     #     plt.savefig('qrnd.png')
 
+    stats_file = "./log/cnn_stats.pickle"
     if args.pickle_stats:
         try:
-            res = pickle.load(open("stats.pickle", "rb"))
+            res = pickle.load(open(stats_file, "rb"))
         except (OSError, IOError) as e:
             res = []
             print(e, 'stats.pickle does not exist, \
@@ -213,7 +214,7 @@ def main():
         res.append({'args': args,
                     'test_loss_lst': test_loss_lst,
                     'test_acc_lst': test_acc_lst})
-        pickle.dump(res, open("stats.pickle", "wb"))
+        pickle.dump(res, open(stats_file, "wb"))
         print('stats.pickle saved.')
 
 
