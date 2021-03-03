@@ -194,9 +194,10 @@ if __name__ == '__main__':
     print('time:', time_str, 'experiment took',
           time.time() - time_start, '[s]')
 
+    stats_file = "./log/rnn_stats.pickle"
     if args.pickle_stats:
         try:
-            res = pickle.load(open("stats_rnn.pickle", "rb"))
+            res = pickle.load(open(stats_file, "rb"))
         except (OSError, IOError) as e:
             res = []
             print(e, 'stats.pickle does not exist, \
@@ -205,5 +206,5 @@ if __name__ == '__main__':
         res.append({'args': args,
                     'train_loss_lst': train_loss_lst,
                     'test_loss_mean': np.mean(test_loss_lst)})
-        pickle.dump(res, open("stats_rnn.pickle", "wb"))
+        pickle.dump(res, open(stats_file, "wb"))
         print('stats_rnn.pickle saved.')

@@ -57,23 +57,23 @@ if __name__ == '__main__':
     #              capsize=2)
     plt.plot(x, pseudo_acc_mean, label='pseudo', color=colors[0], marker="o")
     plt.fill_between(x, pseudo_acc_mean - pseudo_acc_std,
-                    pseudo_acc_mean + pseudo_acc_std,
-                    color=colors[0], alpha=0.2)
+                     pseudo_acc_mean + pseudo_acc_std,
+                     color=colors[0], alpha=0.2)
 
     x = np.array(range(len(quantum_acc_mean)))
     plt.plot(x, quantum_acc_mean, label='quantum', color=colors[1], marker="s")
     plt.fill_between(x, quantum_acc_mean - quantum_acc_std,
-                    quantum_acc_mean + quantum_acc_std,
-                    color=colors[1], alpha=0.2)
+                     quantum_acc_mean + quantum_acc_std,
+                     color=colors[1], alpha=0.2)
 
     x = np.array(range(len(pseudoquantum_acc_mean)))
     # plt.errorbar(x, pseudoquantum_acc_mean, yerr=pseudoquantum_acc_std,
     #              label='pseudoquantum', capsize=2)
     plt.plot(x, pseudoquantum_acc_mean, label='pseudoquantum', color=colors[2],
-            marker="v")
+             marker="v")
     plt.fill_between(x, pseudoquantum_acc_mean - pseudoquantum_acc_std,
-                    pseudoquantum_acc_mean + pseudoquantum_acc_std,
-                    color=colors[2], alpha=0.2)
+                     pseudoquantum_acc_mean + pseudoquantum_acc_std,
+                     color=colors[2], alpha=0.2)
 
     plt.ylabel('acc')
     plt.xlabel('epochs')
