@@ -1,7 +1,6 @@
 import math
 import torch
 import numpy as np
-from src import FCMLQ
 
 
 def get_quantum_uniform(shape: tuple, low: float, high: float,
@@ -51,10 +50,9 @@ def pseudo_quantum_uniform(from_: float, to_: float, size: tuple = 1,
     # this creates a potentially very large intermediate array to store all bits..
     # a different solution might be to build up the values incrementally, sacrificing
     # some performance.
-    bits = np.random.binomial(1, p=mean_qubit_value,
-                              size=(*size, bits_per_float))
-    e = 2.0 ** np.arange(-bits_per_float, 0)
-    return (to_-from_)*np.dot(bits, e)+from_
+    bits = (torch.rand(*size, bits_per_float) < mean_qubit_value).float()
+    e = 2.0 ** torch.arange(-bits_per_float, 0)
+    return (to_-from_) * (bits @ e) + from_
 
 
 def kaiming_uniform_(tensor: torch.tensor,
