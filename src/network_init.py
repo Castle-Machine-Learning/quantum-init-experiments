@@ -1,6 +1,7 @@
 import math
 import torch
 import numpy as np
+from src import FCMLQ
 
 
 def get_quantum_uniform(shape: tuple, low: float, high: float,
@@ -47,9 +48,9 @@ def pseudo_quantum_uniform(from_: float, to_: float, size: tuple = 1,
     # make sure size is a tuple
     if isinstance(size, int):
         size = (size,)
-    # this creates a potentially very large intermediate array to store all bits..
-    # a different solution might be to build up the values incrementally, sacrificing
-    # some performance.
+    # this creates a potentially very large array to store all bits..
+    # a different solution might be to build up the values incrementally,
+    # sacrificing some performance.
     bits = (torch.rand(*size, bits_per_float) < mean_qubit_value).float()
     e = 2.0 ** torch.arange(-bits_per_float, 0)
     return (to_-from_) * (bits @ e) + from_
@@ -94,8 +95,8 @@ def kaiming_uniform_(tensor: torch.tensor,
             tensor.uniform_(-bound, bound)
     elif mode == 'pseudoquantum':
         with torch.no_grad():
-            tensor.data.copy_(torch.from_numpy(
-                pseudo_quantum_uniform(-bound, bound, size=tuple(tensor.shape)).astype(np.float16)))
+            tensor.data.copy_(
+                pseudo_quantum_uniform(-bound, bound, size=tuple(tensor.shape)))
     else:
         raise ValueError(f'Unknown model "{mode}", options are: "quantum",\
                          "pseudo", "pseudoquantum"')

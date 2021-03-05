@@ -215,7 +215,7 @@ def main():
                     'test_loss_lst': test_loss_lst,
                     'test_acc_lst': test_acc_lst})
         pickle.dump(res, open(stats_file, "wb"))
-        print('stats.pickle saved.')
+        print(stats_file, ' saved.')
 
 
 if __name__ == '__main__':

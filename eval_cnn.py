@@ -8,7 +8,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='Plot resuts from a CNN experiment')
-    parser.add_argument('--logfile', type=str, default='./log/stats.pickle')
+    parser.add_argument('--logfile', type=str,
+                        default='./log/cnn_stats.pickle')
     eval_args = parser.parse_args()
 
     print('starting evaluation.')
