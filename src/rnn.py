@@ -118,10 +118,9 @@ class LSTMCell(torch.nn.Module):
                     weight.uniform_(-stdv, stdv)
             elif init == 'pseudoquantum':
                 with torch.no_grad():
-                    weight.data.copy_(torch.from_numpy(
-                        pseudo_quantum_uniform(-stdv, stdv,
-                                               size=tuple(weight.shape)
-                                               ).astype(np.float16)))
+                    weight.data.copy_(pseudo_quantum_uniform(
+                        -stdv, stdv, size=tuple(weight.shape)
+                        ))
             else:
                 raise ValueError(f'Unknown model "{init}", options are: "quantum",\
                                 "pseudo", "pseudoquantum"')
