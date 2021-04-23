@@ -5,12 +5,29 @@ import matplotlib.pyplot as plt
 import tikzplotlib
 
 
+def tensorboard_average(y, window):
+    '''
+    * The smoothing algorithm is a simple moving average, which, given a
+     * point p and a window w, replaces p with a simple average of the
+     * points in the [p - floor(w/2), p + floor(w/2)] range.
+    '''
+    if window > 0:
+        window_vals = []
+        length = y.shape[-1]
+        for p_no in range(0, length, window):
+            if p_no > window/2 and p_no < length - window/2:
+                window_vals.append(np.mean(y[p_no-int(window/2):p_no+int(window/2)]))
+        return np.array(window_vals)
+    else:
+        return y
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='Plot resuts from a CNN experiment')
     parser.add_argument('--logfile', type=str,
-                        default='./log/stats_rnn20.pickle')
+                        default='./log/rnn_stats.pickle')
     eval_args = parser.parse_args()
 
     print('starting rnn evaluation.')
@@ -49,7 +66,8 @@ if __name__ == '__main__':
     memory_pseudoquantum_loss = np.array(memory_pseudoquantum_loss)
 
     def mean_std(loss: np.array) -> tuple:
-        return np.mean(loss, axis=0), np.std(loss, axis=0)
+        return tensorboard_average(np.mean(loss, axis=0), 75),\
+               tensorboard_average(np.std(loss, axis=0), 75)
 
     adding_pseudo_mean, adding_pseudo_std = mean_std(adding_pseudo_loss)
     adding_quantum_mean, adding_quantum_std = mean_std(adding_quantum_loss)
@@ -68,8 +86,8 @@ if __name__ == '__main__':
         x = np.array(range(len(mean)))
         plt.plot(x, mean, label=label, color=color,
                  marker=marker)
-        # plt.fill_between(x, mean - std, mean + std,
-        #                  color=color, alpha=0.2)
+        plt.fill_between(x, mean - std, mean + std,
+                         color=color, alpha=0.2)
 
     plot(adding_pseudo_mean, adding_pseudo_std, colors[0], marker='o',
          label='pseudo')
@@ -82,9 +100,11 @@ if __name__ == '__main__':
     plt.title('adding problem lstm')
     plt.legend()
     # plt.savefig('random_eval.png')
-    # tikzplotlib.save('random_eval.tex', standalone=True)
+    tikzplotlib.save('rnn_eval_adding.tex', standalone=True)
     plt.show()
     # memory plot
+
+    window_size = 50
 
     plot(memory_pseudo_mean, memory_pseudo_std, colors[0], marker='o',
          label='pseudo')
@@ -96,9 +116,8 @@ if __name__ == '__main__':
     plt.xlabel('updates')
     plt.title('memory problem lstm')
     plt.legend()
-    # plt.savefig('random_eval.png')
-    # tikzplotlib.save('random_eval.tex', standalone=True)
+    tikzplotlib.save('rnn_eval_memory.tex', standalone=True)
+    #plt.savefig('rnn_eval.png')
     plt.show()
-
 
     print('plots saved.')
