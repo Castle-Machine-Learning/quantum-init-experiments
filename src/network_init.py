@@ -43,8 +43,8 @@ def _calculate_fan_in_and_fan_out(tensor):
 
 
 def pseudo_quantum_uniform(from_: float, to_: float, size: tuple = 1,
-                           mean_qubit_value: float = 0.475,
-                           bits_per_float: int = 16):
+                           mean_qubit_value: float = 0.4888166412003887,
+                           bits_per_float: int = 32):
     # make sure size is a tuple
     if isinstance(size, int):
         size = (size,)
