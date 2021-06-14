@@ -1,25 +1,24 @@
 import math
 import torch
 import numpy as np
-from src import FCMLQ
 
 
 def get_quantum_uniform(shape: tuple, low: float, high: float,
-                        address='tcp://localhost:5555') -> np.array:
+                        file=None) -> np.array:
     """ Get a numpy array with quantum uniformly initialized numbers
 
     Args:
         shape (ouple): Desired output array shape
         low (float): The lower bound of the uniform distribution
         high (float): The upper bound of the uniform distribution
-        address (optional): Location of the quantum randomness
+        file (optional): Location of the quantum randomness
             provider. Defaults to tcp://localhost:5555 .
 
     Returns:
         uniform (nparray): Array initialized to U(a, b).
     """
     number_count = np.prod(shape)
-    zero_one = FCMLQ.request_rnd(number_count, address=address)
+    zero_one = file.request_rnd(number_count)
     zero_one = np.reshape(zero_one, shape)
     uniform = (high - low) * zero_one + low
     return uniform
@@ -57,9 +56,8 @@ def pseudo_quantum_uniform(from_: float, to_: float, size: tuple = 1,
 
 
 def kaiming_uniform_(tensor: torch.tensor,
-                     a=0, fan=None,
-                     nonlinearity: str = 'relu',
-                     mode='quantum', address='tcp://localhost:5555',
+                     a=0, fan=None, nonlinearity: str = 'relu',
+                     mode='quantum', file=None,
                      ) -> None:
     """ In place-initializtion with a quantum kaiming_uniform initialization.
         The implementation follows:
@@ -74,8 +72,7 @@ def kaiming_uniform_(tensor: torch.tensor,
         nonlinearity (str, optional): [description]. Defaults to 'relu'.
         quantum (bool, optional): Use pseudorandom numbers if False.
             Defaults to True.
-        address (str, optional): Location of the quantum randomness server.
-            Defaults to 'tcp://localhost:5555'.
+        address (str, optional): Quantum randomness file. Defaults to None.
     """
     if not fan:
         fan, _ = _calculate_fan_in_and_fan_out(tensor)
@@ -86,7 +83,7 @@ def kaiming_uniform_(tensor: torch.tensor,
 
     if mode == 'quantum':
         quantum_random = get_quantum_uniform(tensor.shape, -bound, bound,
-                                             address=address)
+                                             file=file)
         with torch.no_grad():
             tensor.data.copy_(torch.from_numpy(
                 quantum_random.astype(np.float16)))
@@ -100,4 +97,3 @@ def kaiming_uniform_(tensor: torch.tensor,
     else:
         raise ValueError(f'Unknown model "{mode}", options are: "quantum",\
                          "pseudo", "pseudoquantum"')
-

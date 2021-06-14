@@ -10,6 +10,7 @@ from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
 import pickle
 from src.network_init import kaiming_uniform_, _calculate_fan_in_and_fan_out
+from src.file_manager import RandomnessFileManager
 
 
 class Net(nn.Module):
@@ -17,7 +18,7 @@ class Net(nn.Module):
         to reduce the number of random numbers required.
     """
     def __init__(self, init='quantum',
-                 address="tcp://localhost:5555"):
+                 randomness_file=None):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, stride=2)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
@@ -26,11 +27,9 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(1600, 64)
         self.fc2 = nn.Linear(64, 10)
         self.init = init
+        self.randomness_file = None
         if self.init == 'quantum':
-            self.qaddress = address
-            # self.qbackend = Aer.get_backend('qasm_simulator')
-        else:
-            self.qaddress = None
+            self.randomness_file = randomness_file
 
         # initialize weights
         # loop over the parameters
@@ -44,7 +43,7 @@ class Net(nn.Module):
 
             kaiming_uniform_(param, fan=fan,
                              mode=self.init,
-                             address=self.qaddress)
+                             file=self.randomness_file)
             previous_tensor = param
 
     def forward(self, x):
@@ -139,6 +138,10 @@ def main():
     parser.add_argument('--init', choices=['quantum', 'pseudo',
                         'pseudoquantum'], default='quantum',
                         help='Set initialization method')
+    parser.add_argument('--storage', type=str,
+                        default='./numbers/storage-5-ANU_3May2012_100MB\
+                            -unshuffled-32bit-160421.pkl')
+    parser.add_argument('--storage-pos', type=int, default=0)
     parser.add_argument('--pickle-stats', action='store_true', default=False,
                         help='If True stores test loss \
                               and acc in pickle file.')
@@ -172,8 +175,11 @@ def main():
     train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
+    if args.init == 'quantum':
+        randomness_file = RandomnessFileManager(args.storage, args.storage_pos)
+
     print(f'initializing using {args.init} numbers.')
-    model = Net(init=args.init).to(device)
+    model = Net(init=args.init, randomness_file=randomness_file).to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
     print('weight count:', compute_parameter_total(model))
