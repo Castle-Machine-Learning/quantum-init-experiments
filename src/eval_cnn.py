@@ -1,3 +1,6 @@
+""" Plot the convolutional neural network training results.
+"""
+
 import pickle
 import argparse
 import numpy as np

@@ -1,3 +1,6 @@
+""" Source code implementing quantum initialization for neural networks.
+"""
+
 import math
 import torch
 import numpy as np

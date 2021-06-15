@@ -105,8 +105,7 @@ class LSTMCell(torch.nn.Module):
 
         self.proj = Parameter(torch.Tensor(hidden_size, output_size))
 
-    def reset_parameters(self, init: str,
-                         address='tcp://localhost:5555') -> None:
+    def reset_parameters(self, init: str) -> None:
         stdv = 1.0 / np.sqrt(self.hidden_size)
         for weight in self.parameters():
             if init == 'quantum':

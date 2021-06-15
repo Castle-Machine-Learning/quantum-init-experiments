@@ -1,5 +1,8 @@
-# based on https://github.com/pytorch/examples/blob/master/mnist/main.py
-# import matplotlib.pyplot as plt
+"""
+Train a convolutional neural networks with different initializations on the
+MNIST digit recognition problem.
+This module is based on https://github.com/pytorch/examples/blob/master/mnist/main.py
+"""
 import os
 import torch
 import pickle

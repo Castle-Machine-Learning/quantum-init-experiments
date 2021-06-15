@@ -1,3 +1,6 @@
+""" Plot recurrent neural network training results.
+"""
+
 import pickle
 import argparse
 import numpy as np

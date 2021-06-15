@@ -1,5 +1,7 @@
 '''
-Following
+Train recurrent neural networks with different initializations 
+on the adding and memory problems as proposed by Hochreiter et al.
+This module is based on:
 https://github.com/v0lta/Wavelet-network-compression/blob/master/adding_memory_RNN_compression.py
 '''
 import time
