@@ -13,7 +13,7 @@ import argparse
 import numpy as np
 from file_manager import RandomnessFileManager
 from rnn import LSTMCell, generate_data_adding, generate_data_memory
-from util import pd_to_string, compute_parameter_total
+from util import compute_parameter_total
 
 
 def train_test_loop(args, in_x, in_y_gt, iteration_no, cell, loss_fun,
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     print('test loss mean', np.mean(test_loss_lst),
           'test acc', test_acc, 'pt', pt)
     store_lst = [train_loss_lst, test_loss_lst, test_acc, pt]
-    pd_str = pd_to_string(pd)
+
     time_str = str(datetime.datetime.today())
     print('time:', time_str, 'experiment took',
           time.time() - time_start, '[s]')
