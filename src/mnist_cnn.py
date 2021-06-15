@@ -10,8 +10,8 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
-from network_init import kaiming_uniform_, _calculate_fan_in_and_fan_out
 from file_manager import RandomnessFileManager
+from network_init import kaiming_uniform_, _calculate_fan_in_and_fan_out
 
 
 class Net(nn.Module):
@@ -23,8 +23,6 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, stride=2)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
-        # self.dropout1 = nn.Dropout(0.25)
-        # self.dropout2 = nn.Dropout(0.5)
         self.fc1 = nn.Linear(1600, 64)
         self.fc2 = nn.Linear(64, 10)
         self.init = init
@@ -140,8 +138,8 @@ def main():
                         'pseudoquantum'], default='quantum',
                         help='Set initialization method')
     parser.add_argument('--storage', type=str,
-                        default='./numbers/storage-5-ANU_3May2012_100MB\
-                            -unshuffled-32bit-160421.pkl')
+                        default='./numbers/storage-5-ANU_3May2012_100MB'
+                        + '-unshuffled-32bit-160421.pkl')
     parser.add_argument('--storage-pos', type=int, default=0)
     parser.add_argument('--pickle-stats', action='store_true', default=False,
                         help='If True stores test loss \

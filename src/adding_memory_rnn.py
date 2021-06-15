@@ -2,15 +2,15 @@
 Following
 https://github.com/v0lta/Wavelet-network-compression/blob/master/adding_memory_RNN_compression.py
 '''
-
 import time
+import torch
+import pickle
 import datetime
 import argparse
-import torch
 import numpy as np
-from src.rnn import LSTMCell, generate_data_adding, generate_data_memory
-from src.util import pd_to_string, compute_parameter_total
-import pickle
+from file_manager import RandomnessFileManager
+from rnn import LSTMCell, generate_data_adding, generate_data_memory
+from util import pd_to_string, compute_parameter_total
 
 
 def train_test_loop(args, in_x, in_y_gt, iteration_no, cell, loss_fun,
@@ -87,6 +87,10 @@ if __name__ == '__main__':
     parser.add_argument('--init', choices=['quantum', 'pseudo',
                         'pseudoquantum'], default='quantum',
                         help='Set initialization method')
+    parser.add_argument('--storage', type=str,
+                        default='./numbers/storage-5-ANU_3May2012_100MB'
+                        + '-unshuffled-32bit-160421.pkl')
+    parser.add_argument('--storage-pos', type=int, default=0)
     parser.add_argument('--pickle-stats', action='store_true', default=False,
                         help='If True stores test loss \
                               and acc in pickle file.')
@@ -130,9 +134,14 @@ if __name__ == '__main__':
     x_test = torch.from_numpy(x_test.astype(np.float32))
     y_test = torch.from_numpy(y_test.astype(np.float32))
 
+    randomness_file = None
+    if args.init == 'quantum':
+        randomness_file = RandomnessFileManager(args.storage, args.storage_pos)
+
     cell = LSTMCell(input_size=input_size,
                     hidden_size=args.hidden,
-                    output_size=output_size)
+                    output_size=output_size,
+                    randomness_file=randomness_file)
     cell.cuda()
     cell.reset_parameters(init=args.init)
 

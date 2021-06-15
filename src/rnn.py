@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 from torch.nn.parameter import Parameter
-from src.network_init import get_quantum_uniform
-from src.network_init import pseudo_quantum_uniform
+from network_init import get_quantum_uniform
+from network_init import pseudo_quantum_uniform
 
 
 def generate_data_adding(time_steps, n_data):
@@ -64,7 +64,8 @@ def generate_data_memory(time_steps, n_data, n_sequence=10):
 
 class LSTMCell(torch.nn.Module):
     def __init__(self, hidden_size=250,
-                 input_size=1, output_size=1):
+                 input_size=1, output_size=1,
+                 randomness_file=None):
         """Create a Long Short Term Memory cell as described at
            https://arxiv.org/pdf/1503.04069.pdf
         Args:
@@ -75,6 +76,7 @@ class LSTMCell(torch.nn.Module):
                                          Defaults to 1.
         """
         super().__init__()
+        self.randomness_file = randomness_file
         self.hidden_size = hidden_size
         self.output_size = output_size
         # create the weights
@@ -109,7 +111,7 @@ class LSTMCell(torch.nn.Module):
         for weight in self.parameters():
             if init == 'quantum':
                 quantum_random = get_quantum_uniform(weight.shape, -stdv, stdv,
-                                                     address=address)
+                                                     file=self.randomness_file)
                 with torch.no_grad():
                     weight.data.copy_(torch.from_numpy(
                         quantum_random.astype(np.float16)))
