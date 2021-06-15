@@ -2,6 +2,7 @@
 Following
 https://github.com/v0lta/Wavelet-network-compression/blob/master/adding_memory_RNN_compression.py
 '''
+import os
 import time
 import torch
 import pickle
@@ -211,6 +212,8 @@ if __name__ == '__main__':
             res = []
             print(e, 'stats.pickle does not exist, \
                   creating a new file.')
+        if not os.path.exists('./log'):
+            os.makedirs('./log')
 
         res.append({'args': args,
                     'train_loss_lst': train_loss_lst,
