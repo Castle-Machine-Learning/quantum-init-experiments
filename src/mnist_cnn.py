@@ -21,7 +21,7 @@ class Net(nn.Module):
     """ Fully connected parameters have been reduced
         to reduce the number of random numbers required.
     """
-    def __init__(self, init='quantum',
+    def __init__(self, init='quantum', pseudoquantum_mean=0.4888166412003887,
                  randomness_file=None):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, stride=2)
@@ -45,7 +45,8 @@ class Net(nn.Module):
 
             kaiming_uniform_(param, fan=fan,
                              mode=self.init,
-                             file=self.randomness_file)
+                             file=self.randomness_file,
+                             pseudoquantum_mean=pseudoquantum_mean)
             previous_tensor = param
 
     def forward(self, x):
@@ -140,6 +141,9 @@ def main():
     parser.add_argument('--init', choices=['quantum', 'pseudo',
                         'pseudoquantum'], default='quantum',
                         help='Set initialization method')
+    parser.add_argument('--pseudomean', type=float, default=0.4888166412003887,
+                        help='Mean of the pseudorandom bits, only\
+                             relevant for --init pseudoquantum')
     parser.add_argument('--storage', type=str,
                         default='./numbers/storage-5-ANU_3May2012_100MB'
                         + '-unshuffled-32bit-160421.pkl')
@@ -182,7 +186,8 @@ def main():
         randomness_file = RandomnessFileManager(args.storage, args.storage_pos)
 
     print(f'initializing using {args.init} numbers.')
-    model = Net(init=args.init, randomness_file=randomness_file).to(device)
+    model = Net(init=args.init, randomness_file=randomness_file,
+                pseudoquantum_mean=args.pseudomean).to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
     print('weight count:', compute_parameter_total(model))

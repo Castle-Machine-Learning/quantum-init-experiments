@@ -61,6 +61,7 @@ def pseudo_quantum_uniform(from_: float, to_: float, size: tuple = 1,
 def kaiming_uniform_(tensor: torch.tensor,
                      a=0, fan=None, nonlinearity: str = 'relu',
                      mode='quantum', file=None,
+                     pseudoquantum_mean=0.4888166412003887,
                      ) -> None:
     """ In place-initializtion with a quantum kaiming_uniform initialization.
         The implementation follows:
@@ -96,7 +97,15 @@ def kaiming_uniform_(tensor: torch.tensor,
     elif mode == 'pseudoquantum':
         with torch.no_grad():
             tensor.data.copy_(
-                pseudo_quantum_uniform(-bound, bound, size=tuple(tensor.shape)))
+                pseudo_quantum_uniform(-bound, bound,
+                                       size=tuple(tensor.shape),
+                                       mean_qubit_value=pseudoquantum_mean))
+            # import matplotlib.pyplot as plt
+            # plt.hist(pseudo_quantum_uniform(-bound, bound, size=100000,
+            #                                 mean_qubit_value=pseudoquantum_mean
+            #                                 ).flatten().numpy())
+            # plt.show()
+            # print('done')
     else:
         raise ValueError(f'Unknown model "{mode}", options are: "quantum",\
                          "pseudo", "pseudoquantum"')
